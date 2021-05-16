@@ -1,18 +1,77 @@
-import {Entity, PrimaryGeneratedColumn, Column} from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  Unique,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from "typeorm";
+import { Group } from "./Group";
+import { Length, MinLength, MaxLength, IsString } from "class-validator";
+import * as bcrypt from "bcryptjs";
 
-@Entity()
+export enum UserRole {
+  PROFESSOR = "professor",
+  STUDENT = "student",
+}
+
+@Entity({ name: "users" })
+@Unique(["username"])
 export class User {
+  @PrimaryGeneratedColumn("uuid")
+  id: number;
 
-    @PrimaryGeneratedColumn()
-    id: number;
+  @Column()
+  @IsString()
+  @MinLength(4, {
+    message: "$property is too short. Minimal length should be $constraint1",
+  })
+  @MaxLength(14, {
+    message: "$property is too long. Maximal length should be $constraint1",
+  })
+  username: string;
 
-    @Column()
-    firstName: string;
+  @MinLength(6, {
+    message: "$property is too short. Minimal length should be $constraint1",
+  })
+  @MaxLength(20, {
+    message: "$property is too long. Maximal length should be $constraint1",
+  })
+  @Column()
+  password: string;
 
-    @Column()
-    lastName: string;
+  @Length(2, 20)
+  @Column()
+  firstname: string;
 
-    @Column()
-    age: number;
+  @Length(3, 20)
+  @Column()
+  lastname: string;
 
+  @ManyToOne(() => Group, (group) => group.id)
+  group: Group;
+
+  @Column({
+    type: "set",
+    enum: UserRole,
+    default: [UserRole.STUDENT],
+  })
+  role: UserRole;
+
+  @Column()
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @Column()
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  hashPassword(): void {
+    this.password = bcrypt.hashSync(this.password, 8);
+  }
+
+  checkIfPasswordValid(unencryptedPassword: string): boolean {
+    return bcrypt.compareSync(unencryptedPassword, this.password);
+  }
 }

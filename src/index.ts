@@ -1,48 +1,67 @@
+import * as dotenv from 'dotenv';
+
 import "reflect-metadata";
-import {createConnection} from "typeorm";
+import { createConnection } from "typeorm";
 import * as express from "express";
 import * as bodyParser from "body-parser";
-import {Request, Response} from "express";
-import {Routes} from "./routes";
-import {User} from "./entity/User";
+import { Request, Response } from "express";
+import { Routes } from "./routes";
+import { User, UserRole } from "./entity/User";
+import { Group } from "./entity/Group";
+import { Lab } from "./entity/Lab";
+import { authToken } from './middleware/auth';
+import { errorMiddleware } from './middleware/error';
 
-createConnection().then(async connection => {
-
+dotenv.config();
+createConnection()
+  .then(async (connection) => {
     // create express app
     const app = express();
-    app.use(bodyParser.json());
+    app.use(express.json());
 
     // register express routes from defined application routes
-    Routes.forEach(route => {
-        (app as any)[route.method](route.route, (req: Request, res: Response, next: Function) => {
-            const result = (new (route.controller as any))[route.action](req, res, next);
-            if (result instanceof Promise) {
-                result.then(result => result !== null && result !== undefined ? res.send(result) : undefined);
-
-            } else if (result !== null && result !== undefined) {
-                res.json(result);
-            }
-        });
+    Routes.forEach((route) => {
+      (app as any)[route.method](route.route, authToken, (req: Request, res: Response, next: Function) => {
+        const result = new (route.controller as any)()[route.action](req, res, next);
+        if (result instanceof Promise) {
+          result.then((result) =>
+            result !== null && result !== undefined ? res.send(result) : undefined
+          );
+        } else if (result !== null && result !== undefined) {
+          res.json(result);
+        }
+      }, errorMiddleware);
     });
 
     // setup express app here
-    // ...
 
     // start express server
-    app.listen(3000);
+    app.listen(8080);
+
+  //  const initialGroup =  connection.manager.create(Group, {
+  //     name: 'TV-71',
+  // });
+
+  // const lab1 =  connection.manager.create(Lab, {
+  //   title: 'Lab 1',
+  //   automataCode: '"hey":[]'
+  // });
+
+  // await connection.manager.save(lab1);
+
+  // await connection.manager.save(initialGroup);
 
     // insert new users for test
-    await connection.manager.save(connection.manager.create(User, {
-        firstName: "Timber",
-        lastName: "Saw",
-        age: 27
-    }));
-    await connection.manager.save(connection.manager.create(User, {
-        firstName: "Phantom",
-        lastName: "Assassin",
-        age: 24
-    }));
+    // await connection.manager.save(connection.manager.create(User, {
+    //     firstName: "Alex",
+    //     lastName: "Swonson",
+    //     username: 'check',
+    //     password: '$2a$08$1znSpaTg83Fdz7TOppF5Fua3IJPmXBKHhxkzZEQwnaz7DGLVqsTIm',
+    //     role: UserRole.STUDENT,
+    // }));
 
-    console.log("Express server has started on port 3000. Open http://localhost:3000/users to see results");
-
-}).catch(error => console.log(error));
+    console.log(
+      "Express server has started on port 8080. Open http://localhost:8080/users to see results"
+    );
+  })
+  .catch((error) => console.log(error));
