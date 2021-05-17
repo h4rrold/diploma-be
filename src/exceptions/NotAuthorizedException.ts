@@ -2,6 +2,6 @@ import {HttpException} from './HttpException';
 
 export class NotAuthorizedException extends HttpException {
   constructor() {
-    super(403, "You're not authorized");
+    super(401, "You're not authorized");
   }
 }

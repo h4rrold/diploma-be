@@ -10,8 +10,9 @@ import { Routes } from "./routes";
 import { User, UserRole } from "./entity/User";
 import { Group } from "./entity/Group";
 import { Lab } from "./entity/Lab";
-import { authToken } from './middleware/auth';
+import { authMiddleware } from './middleware/auth';
 import { errorMiddleware } from './middleware/error';
+import { roleMiddleware} from './middleware/role';
 
 dotenv.config();
 createConnection()
@@ -23,7 +24,7 @@ createConnection()
 
     // register express routes from defined application routes
     Routes.forEach((route) => {
-      (app as any)[route.method](route.route, authToken, (req: Request, res: Response, next: Function) => {
+      (app as any)[route.method](route.route, authMiddleware(!!route.withAuth), roleMiddleware(route.permissions), (req: Request, res: Response, next: Function) => {
         const result = new (route.controller as any)()[route.action](req, res, next);
         if (result instanceof Promise) {
           result.then((result) =>

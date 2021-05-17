@@ -6,6 +6,7 @@ import {
   Unique,
   CreateDateColumn,
   UpdateDateColumn,
+  JoinColumn,
 } from "typeorm";
 import { Group } from "./Group";
 import { Length, MinLength, MaxLength, IsString } from "class-validator";
@@ -49,7 +50,10 @@ export class User {
   @Column()
   lastname: string;
 
+  @Column({nullable: true})
+  groupId: string;
   @ManyToOne(() => Group, (group) => group.id)
+  @JoinColumn({name: 'groupId'})
   group: Group;
 
   @Column({

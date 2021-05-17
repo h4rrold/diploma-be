@@ -2,6 +2,7 @@ import { UserController } from "./controller/UserController";
 import { GroupController } from "./controller/GroupController";
 import { AuthController } from "./controller/AuthController";
 import { RefreshTokenController } from "./controller/RefreshTokenController";
+import { UserRole } from "./entity/User";
 
 export const Routes = [
   {
@@ -9,6 +10,7 @@ export const Routes = [
     route: "/users",
     controller: UserController,
     action: "all",
+    permissions: [UserRole.PROFESSOR]
   },
   {
     method: "get",
@@ -28,31 +30,38 @@ export const Routes = [
     controller: UserController,
     action: "remove",
   },
-  {
-    method: "get",
-    route: "/groups",
-    controller: GroupController,
-    action: "all",
-  },
+  /** Auth Routes */
   {
     method: "post",
     route: '/login',
     controller: AuthController,
     action: 'login',
-    noToken: true
   },
   {
     method: "post",
     route: '/register',
     controller: AuthController,
     action: 'register',
-    noToken: true
+  },
+  /** Group Controller */
+  {
+    method: "get",
+    route: "/groups",
+    controller: GroupController,
+    action: "listAll",
+  },
+  {
+    method: "post",
+    route: '/groups',
+    controller: GroupController,
+    action: 'createOne',
+    withAuth: true,
+    permissions: [UserRole.PROFESSOR]
   },
   {
     method: "post",
     route: '/refresh_token',
     controller: RefreshTokenController,
     action: 'refresh',
-    noToken: true
   }
 ];

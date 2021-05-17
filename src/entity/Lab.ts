@@ -1,5 +1,6 @@
-import {Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable} from "typeorm";
-import { User } from '../entity/User';
+import {Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, JoinColumn} from "typeorm";
+import { User } from './User';
+import { AutomataCode } from './AutomataCode';
 
 @Entity({ name: 'labs'})
 export class Lab {
@@ -10,8 +11,8 @@ export class Lab {
     @Column("varchar", {length: '96'})
     title: string
 
-    @Column("")
-    automataCode: string;
+    @Column("text")
+    automataCodes: AutomataCode[];
 
     @ManyToMany(() => User)
     @JoinTable()

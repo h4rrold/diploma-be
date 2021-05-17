@@ -2,7 +2,7 @@ import * as jwt from 'jsonwebtoken';
 import { User } from '../entity/User';
 
 export const getAccessToken = (username: string):string => {
-    return jwt.sign({name: username}, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15s' });
+    return jwt.sign({name: username}, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
 }
 
 export const getRefreshtoken = (username:string):string => {

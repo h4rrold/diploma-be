@@ -33,37 +33,68 @@ export class AuthController {
     const refreshToken = getRefreshtoken(username);
     refreshTokensList.push(refreshToken);
 
-    res.json({ success: true, accessToken, refreshToken, user: { username: user.username, userId: user.id, role: user.role, group: user.group } });
+    res.json({ success: true, 
+        accessToken, 
+        refreshToken, 
+        user: { 
+          username: user.username, 
+          id: user.id, 
+          role: user.role, 
+          group: user.group, 
+          lastname: user.lastname, 
+          firstname: user.firstname 
+        }
+      });
   }
 
   
   async register(req: Request, res: Response, next: NextFunction): Promise<any> {
-    const {username, password, firstname, lastname }: any = req.body;
+    const {username, password, firstname, lastname, group }: any = req.body;
     
-    if(await this.userRepository.findOne({username: username})) {
+    if (await this.userRepository.findOne({username: username})) {
       return next(new UserWithThatUsernameExistsException(username));
     }
-
-    const user = this.userRepository.create({
-      username,
-      password, 
-      firstname,
-      lastname
-    });
+     
+      const user = await this.userRepository.create({
+        username,
+        password, 
+        firstname,
+        lastname,
+        group
+      });
+    
 
     const errors = await validate(user, { validationError: { target: false, value: false } });
-    if(errors.length) {
-      return next(new HttpException(400, 'Validation Error', errors));
+    if (errors.length) {
+      return next(new HttpException(500, 'Validation Error', errors));
     }
 
     user.hashPassword();
-    const createdUser = await this.userRepository.save(user);
+
+    let createdUser: any;
+    try {
+      createdUser = await this.userRepository.save(user);
+    } catch (e) {
+      return next(new HttpException(400, 'Oops. Error occured on user creation', errors));
+    }
+  
 
     const accessToken = getAccessToken(username);
     const refreshToken = getRefreshtoken(username);
     refreshTokensList.push(refreshToken);
     
-    res.status(200).json({success: true, accessToken, refreshToken, user: { username: createdUser.username, userId: createdUser.id, role: createdUser.role, group: createdUser.group }  })
+    res.status(200).json({ success: true, 
+      accessToken, 
+      refreshToken, 
+      user: { 
+        username: createdUser.username, 
+        id: createdUser.id, 
+        role: createdUser.role, 
+        group: createdUser.group, 
+        lastname: createdUser.lastname, 
+        firstname: createdUser.firstname 
+      }
+    });
   }
 
 }
