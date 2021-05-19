@@ -4,7 +4,7 @@ import { refreshTokensList, verifyRefreshToken, getAccessToken } from '../helper
 
 export class RefreshTokenController {
 
-    async refresh(req: Request, res: Response): Promise<any> {
+    async refresh(req: Request, res: Response): Response {
         const { refreshToken } = req.body;
         if (!refreshToken || !refreshTokensList.includes(refreshToken)) return res.sendStatus(400);
 

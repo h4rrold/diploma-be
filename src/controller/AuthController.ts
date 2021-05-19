@@ -13,7 +13,7 @@ import { HttpException } from "../exceptions/HttpException";
 export class AuthController {
   private userRepository = getRepository(User);
  
-  async login(req: Request, res: Response, next: NextFunction): Promise<any> {
+  async login(req: Request, res: Response, next: NextFunction): Promise<User> {
     const { username, password } = req.body;
     if (!(username && password)) next(new WrongCredentialsException());
 
@@ -48,7 +48,7 @@ export class AuthController {
   }
 
   
-  async register(req: Request, res: Response, next: NextFunction): Promise<any> {
+  async register(req: Request, res: Response, next: NextFunction): Promise<User> {
     const {username, password, firstname, lastname, group }: any = req.body;
     
     if (await this.userRepository.findOne({username: username})) {

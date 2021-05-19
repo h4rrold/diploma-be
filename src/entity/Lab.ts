@@ -1,20 +1,23 @@
-import {Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, JoinColumn} from "typeorm";
-import { User } from './User';
-import { AutomataCode } from './AutomataCode';
+import {Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, JoinColumn, ManyToOne, OneToMany} from "typeorm";
+import { Group } from "./Group";
+import { UserLab } from "./UserLab";
 
-@Entity({ name: 'labs'})
+@Entity({ name: 'lab'})
 export class Lab {
 
     @PrimaryGeneratedColumn("uuid")
     id: number;
 
-    @Column("varchar", {length: '96'})
+    @Column("varchar", {length: '255'})
     title: string
 
     @Column("text")
-    automataCodes: AutomataCode[];
-
-    @ManyToMany(() => User)
+    automataCodes: string;
+    
+    @ManyToMany(() => Group)
     @JoinTable()
-    user: User[]
+    groups: Group[]
+
+    @OneToMany(() => UserLab, (userLab) => userLab.lab)
+    userLabs: UserLab[]
 }

@@ -3,6 +3,7 @@ import { GroupController } from "./controller/GroupController";
 import { AuthController } from "./controller/AuthController";
 import { RefreshTokenController } from "./controller/RefreshTokenController";
 import { UserRole } from "./entity/User";
+import { LabController } from "./controller/LabController";
 
 export const Routes = [
   {
@@ -10,7 +11,7 @@ export const Routes = [
     route: "/users",
     controller: UserController,
     action: "all",
-    permissions: [UserRole.PROFESSOR]
+    //permissions: [UserRole.PROFESSOR]
   },
   {
     method: "get",
@@ -56,12 +57,24 @@ export const Routes = [
     controller: GroupController,
     action: 'createOne',
     withAuth: true,
-    permissions: [UserRole.PROFESSOR]
+    //permissions: [UserRole.PROFESSOR]
   },
   {
     method: "post",
     route: '/refresh_token',
     controller: RefreshTokenController,
     action: 'refresh',
+  },
+  {
+    method: "post",
+    route: '/labs',
+    controller: LabController,
+    action: 'save'
+  },
+  { 
+    method: 'get',
+    route: '/labs',
+    controller: LabController,
+    action: 'all'
   }
 ];

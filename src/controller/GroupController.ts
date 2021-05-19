@@ -8,11 +8,11 @@ export class GroupController {
 
     private groupRepository = getRepository(Group);
 
-    async listAll() {
+    async listAll():Promise<Group[]> {
         return await this.groupRepository.find();
     }
 
-    async createOne(req: Request, res: Response, next: NextFunction) {
+    async createOne(req: Request, res: Response, next: NextFunction):Promise<Group> {
         const { title } = req.body;
         
         const group = new Group();

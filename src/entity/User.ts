@@ -7,9 +7,11 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   JoinColumn,
+  OneToMany,
 } from "typeorm";
 import { Group } from "./Group";
 import { Length, MinLength, MaxLength, IsString } from "class-validator";
+import { UserLab } from './UserLab'
 import * as bcrypt from "bcryptjs";
 
 export enum UserRole {
@@ -17,7 +19,7 @@ export enum UserRole {
   STUDENT = "student",
 }
 
-@Entity({ name: "users" })
+@Entity({ name: "user" })
 @Unique(["username"])
 export class User {
   @PrimaryGeneratedColumn("uuid")
@@ -50,10 +52,8 @@ export class User {
   @Column()
   lastname: string;
 
-  @Column({nullable: true})
-  groupId: string;
-  @ManyToOne(() => Group, (group) => group.id)
-  @JoinColumn({name: 'groupId'})
+
+  @ManyToOne(() => Group, (group) => group.id, {nullable: true})
   group: Group;
 
   @Column({
@@ -70,6 +70,9 @@ export class User {
   @Column()
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(() => UserLab, (userLab) => userLab.user)
+  userLabs: UserLab[]
 
   hashPassword(): void {
     this.password = bcrypt.hashSync(this.password, 8);

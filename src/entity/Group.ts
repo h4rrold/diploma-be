@@ -2,7 +2,7 @@ import {Entity, PrimaryGeneratedColumn, Column, OneToMany, Unique} from "typeorm
 import { User } from "./User";
 import { Length } from "class-validator";
 
-@Entity({ name: 'groups'})
+@Entity({ name: 'group'})
 @Unique(['title'])
 export class Group {
 
@@ -13,6 +13,6 @@ export class Group {
     @Column('varchar', {length: 10})
     title: string;
 
-    @OneToMany(() => User, user => user.groupId)
+    @OneToMany(() => User, user => user.group)
     users: User[]
 }
