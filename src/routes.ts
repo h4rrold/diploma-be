@@ -31,6 +31,13 @@ export const Routes = [
     controller: UserController,
     action: "remove",
   },
+  {
+    //withAuth: true,
+    method: 'get',
+    route: '/user-group-labs/:userId',
+    controller: UserController,
+    action: 'getUserGroupLabsList' 
+  },
   /** Auth Routes */
   {
     method: "post",
@@ -52,12 +59,54 @@ export const Routes = [
     action: "listAll",
   },
   {
+    method: "get",
+    route: "/groups/:id",
+    controller: GroupController,
+    action: "findOne",
+  },
+  {
     method: "post",
     route: '/groups',
     controller: GroupController,
     action: 'createOne',
+  },
+  {
+    method: "delete",
+    route: '/groups',
+    controller: GroupController,
+    action: 'removeOne',
+  },
+  {
+    method: "put",
+    route: '/groups',
+    controller: GroupController,
+    action: 'updateOne',
+  },
+  {
+    method: 'get',
+    route: '/available-labs/:id',
+    controller: GroupController,
+    action: 'allAvailableLabs'
+  },
+  {
+    method: 'delete',
+    route: '/delete-group-lab/:groupId/:labId',
+    controller: GroupController,
+    action: 'deleteLab'
+  },
+  {
+    method: 'delete',
+    route: '/delete-group-user/:groupId/:userId',
+    controller: GroupController,
+    action: 'deleteUser',
+    withAuth: true
+  },
+  {
+    method: 'get',
+    route: '/users-search/',
+    controller: GroupController,
+    action: 'searchUserToAdd',
     withAuth: true,
-    //permissions: [UserRole.PROFESSOR]
   },
   {
     method: "post",
@@ -65,16 +114,19 @@ export const Routes = [
     controller: RefreshTokenController,
     action: 'refresh',
   },
+   /** Lab Controller */
   {
     method: "post",
     route: '/labs',
     controller: LabController,
-    action: 'save'
+    action: 'save',
+    withAuth: true,
   },
   { 
     method: 'get',
     route: '/labs',
     controller: LabController,
-    action: 'all'
-  }
+    action: 'listAll',
+    withAuth: true,
+  },
 ];

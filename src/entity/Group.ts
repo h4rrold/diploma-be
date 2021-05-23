@@ -1,6 +1,7 @@
-import {Entity, PrimaryGeneratedColumn, Column, OneToMany, Unique} from "typeorm";
+import {Entity, PrimaryGeneratedColumn, Column, OneToMany, Unique, ManyToMany} from "typeorm";
 import { User } from "./User";
 import { Length } from "class-validator";
+import { Lab } from "./Lab";
 
 @Entity({ name: 'group'})
 @Unique(['title'])
@@ -15,4 +16,8 @@ export class Group {
 
     @OneToMany(() => User, user => user.group)
     users: User[]
+
+    @ManyToMany(() => Lab, lab => lab.groups)
+    labs: Lab[]
+
 }

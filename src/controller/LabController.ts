@@ -5,7 +5,7 @@ import { Lab } from "../entity/Lab";
 export class LabController {
   private labRepository = getRepository(Lab);
 
-  async all():Promise<Lab[]> {
+  async listAll():Promise<Lab[]> {
     return await this.labRepository.find({relations: ['groups', 'userLabs','userLabs.user']});
   }
 

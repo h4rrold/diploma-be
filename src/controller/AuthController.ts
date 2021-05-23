@@ -2,8 +2,8 @@ import { getRepository } from "typeorm";
 import { Request, Response,  NextFunction } from "express";
 import { validate } from 'class-validator';
 
-import { User } from "../entity/User";
-import { UserNotFoundException } from '../exceptions/UserNotFoundException';
+import { User, UserRole } from "../entity/User";
+import { UserNotFoundException } from '../exceptions/NotFoundException';
 import { WrongCredentialsException } from '../exceptions/WrongCredentialsException';
 import { UserWithThatUsernameExistsException} from '../exceptions/UserWithThatUsernameExistsException';
 import { getAccessToken, getRefreshtoken, refreshTokensList } from "../helpers/jwt";
@@ -17,19 +17,19 @@ export class AuthController {
     const { username, password } = req.body;
     if (!(username && password)) next(new WrongCredentialsException());
 
-    let user:User;
+    let user = new User();
 
     try {
       user = await this.userRepository.findOneOrFail({ where: { username } });
     } catch (e) {
-      next(new UserNotFoundException(username))
+      return next(new UserNotFoundException(username))
     }
 
     if (user && !user.checkIfPasswordValid(password)) {
       return next(new WrongCredentialsException())
     }
 
-    const accessToken = getAccessToken(username);
+    const accessToken = getAccessToken(username, user.role);
     const refreshToken = getRefreshtoken(username);
     refreshTokensList.push(refreshToken);
 
@@ -60,7 +60,8 @@ export class AuthController {
         password, 
         firstname,
         lastname,
-        group
+        group: group || null,
+        role: UserRole.STUDENT
       });
     
 
@@ -79,7 +80,7 @@ export class AuthController {
     }
   
 
-    const accessToken = getAccessToken(username);
+    const accessToken = getAccessToken(username, UserRole.STUDENT);
     const refreshToken = getRefreshtoken(username);
     refreshTokensList.push(refreshToken);
     

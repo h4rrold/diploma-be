@@ -7,12 +7,13 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   JoinColumn,
-  OneToMany,
+  OneToMany
 } from "typeorm";
 import { Group } from "./Group";
 import { Length, MinLength, MaxLength, IsString } from "class-validator";
 import { UserLab } from './UserLab'
 import * as bcrypt from "bcryptjs";
+import { Exclude} from 'class-transformer';
 
 export enum UserRole {
   PROFESSOR = "professor",
@@ -23,7 +24,7 @@ export enum UserRole {
 @Unique(["username"])
 export class User {
   @PrimaryGeneratedColumn("uuid")
-  id: number;
+  id: string;
 
   @Column()
   @IsString()
@@ -41,7 +42,9 @@ export class User {
   @MaxLength(20, {
     message: "$property is too long. Maximal length should be $constraint1",
   })
+
   @Column()
+  @Exclude()
   password: string;
 
   @Length(2, 20)

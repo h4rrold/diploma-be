@@ -10,7 +10,7 @@ export const roleMiddleware = (roles: UserRole[]) => {
         }
 
         const { user } = req;
-        console.log(user);
+        console.log(user.role)
         if(user && roles.includes(user.role)) {
             return next();
         }

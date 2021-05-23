@@ -1,8 +1,8 @@
 import * as jwt from 'jsonwebtoken';
-import { User } from '../entity/User';
+import { UserRole, User } from '../entity/User';
 
-export const getAccessToken = (username: string):string => {
-    return jwt.sign({name: username}, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
+export const getAccessToken = (username: string, role:UserRole):string => {
+    return jwt.sign({name: username, role: role }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
 }
 
 export const getRefreshtoken = (username:string):string => {
@@ -11,7 +11,10 @@ export const getRefreshtoken = (username:string):string => {
 
 export const verifyRefreshToken = (refreshToken:string, onSuccess: Function, onError: Function):void => {
     jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user: User) => {
-        if(err) onError && onError(err);
+        if(err) { 
+            onError && onError(err); 
+            return 
+        };
         onSuccess && onSuccess(user);
     });
 }

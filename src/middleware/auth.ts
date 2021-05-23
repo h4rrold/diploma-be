@@ -15,7 +15,10 @@ export const authMiddleware = (withToken:boolean) => {
     }
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-      if (err) return res.sendStatus(401);
+      if (err) {
+        if(err.name === 'TokenExpiredError') return res.status(401).json({error: true, name: 'TokenExpiredError' }) ; 
+        return res.sendStatus(401);
+      }
       req.user = user;
       console.log(user)
       next();
