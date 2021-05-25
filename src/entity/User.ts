@@ -62,7 +62,7 @@ export class User {
   @Column({
     type: "set",
     enum: UserRole,
-    default: [UserRole.STUDENT],
+    default: UserRole.STUDENT,
   })
   role: UserRole;
 

@@ -20,7 +20,6 @@ export const authMiddleware = (withToken:boolean) => {
         return res.sendStatus(401);
       }
       req.user = user;
-      console.log(user)
       next();
     });
   }

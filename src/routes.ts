@@ -38,6 +38,18 @@ export const Routes = [
     controller: UserController,
     action: 'getUserGroupLabsList' 
   },
+  {
+    method: 'post',
+    route: '/save-user-lab',
+    controller: UserController,
+    action: 'saveUserLab'
+  },
+  {
+    method: 'get',
+    route: '/get-user-lab/:userId/:labId',
+    controller: UserController,
+    action: 'getUserLab'
+  },
   /** Auth Routes */
   {
     method: "post",

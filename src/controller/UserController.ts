@@ -1,14 +1,17 @@
 import {getRepository} from "typeorm";
 import {NextFunction, Request, Response} from "express";
 import {User} from "../entity/User";
-import { GroupNotFoundException, UserNotFoundException } from "../exceptions/NotFoundException";
+import { GroupNotFoundException, LabNotFoundException, UserNotFoundException } from "../exceptions/NotFoundException";
 import { group } from "console";
 import { Lab } from "../entity/Lab";
+import { UserLab } from "../entity/UserLab";
+import { throws } from "assert";
 
 export class UserController {
 
     private userRepository = getRepository(User);
     private labsRepository = getRepository(Lab);
+    private userLabsRepository = getRepository(UserLab);
 
     async all(request: Request, response: Response, next: NextFunction) {
         return this.userRepository.find();
@@ -33,8 +36,9 @@ export class UserController {
             return response.sendStatus(400);
         }
         const user = await this.userRepository.findOne({relations: ['group'],where: {id: userId}});
+
         if(!user) {
-            return next(new UserNotFoundException(''));
+            return response.sendStatus(400);
         }
       
         if(!user.group) {
@@ -47,5 +51,75 @@ export class UserController {
         .execute();;
         
         return response.status(200).json({labs});
+    }
+
+    async saveUserLab(request: Request, response: Response, next: NextFunction):Promise<UserLab> {
+        const { userId, labId, automataCodes} = request.body;
+
+        if (!userId && !labId) {
+            return response.sendStatus(400);
+        }
+
+        if(!await this.userRepository.findOne(userId)){
+            return next(new UserNotFoundException(''));
+        }
+
+        if(!await this.labsRepository.findOne(labId)){
+            return next(new LabNotFoundException());
+        }
+
+        let userLab:UserLab;
+
+        const existed = await this.userLabsRepository.findOne({where: {
+            lab: labId,
+            user: userId
+        }});
+        if(existed) {
+            userLab = existed;
+        } else {
+            userLab = new UserLab();
+        }
+       
+        userLab.automataCodes = automataCodes;
+        userLab.lab = labId;
+        userLab.user = userId;
+        userLab.status = '-';
+
+        const savedUserLab = await this.userLabsRepository.save(userLab);
+        return response.status(200).json(savedUserLab)
+    }
+
+    async getUserLab(request: Request, response: Response, next: NextFunction): Promise<UserLab> {
+        const { labId, userId } = request.params;
+        if(!userId || !labId) {
+            response.sendStatus(400);
+        }
+
+        if(!await this.userRepository.findOne(userId)){
+            return next(new UserNotFoundException(''));
+        }
+
+        if(!await this.labsRepository.findOne(labId)){
+            return next(new LabNotFoundException());
+        }
+
+        const existed = await this.userLabsRepository.findOne({where: {
+            lab: labId,
+            user: userId
+        }});
+
+        let userLab:UserLab;
+        if(existed) {
+            userLab = existed;
+        } else {
+            userLab= new UserLab();
+            const lab =  await this.labsRepository.findOne({where: {
+                id: labId,
+            }});
+            userLab.automataCodes = lab.automataCodes;
+            userLab.status = '-';
+        }
+
+        return response.status(200).json({lab: userLab});
     }
 }
